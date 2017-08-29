@@ -42,7 +42,7 @@ def crawl_detail(page):
 
 def main():
     spider = threading.Thread(target=crawl_today)
-    spider.start()
+    # spider.start()
 
     app.run('127.0.0.1', 23333)
     pass

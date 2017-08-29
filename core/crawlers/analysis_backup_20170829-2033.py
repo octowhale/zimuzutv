@@ -79,9 +79,7 @@ def detail(html, items=None):
     fmts = {}
 
     """季字典"""
-    # seasons = {}
-    seasons_list = []
-    seasons_dict = {}
+    seasons = {}
     # li_tags = soup.find_all('li', class_='clearfix')
     for fmt in fmts_list:
         # li_tags = soup.find_all('li', class_='clearfix', format_='MP4')
@@ -97,22 +95,16 @@ def detail(html, items=None):
             season = li_tag['season']
             episode = li_tag['episode']
 
-            enp_title = li_tag.find('div', class_='fl').a.text
-            # print(enp_title)
-
             a_tags = li_tag.find('div', class_='fr').find_all('a')
 
             """集字典"""
             episodes = {}
 
-            # fmts["第_{}_集".format(episode)] = episodes
-            fmts["_".join(enp_title.split('.'))] = episodes
+            fmts["第_{}_集".format(episode)] = episodes
 
-            # seasons[fmt] = fmts
-            seasons_dict[season] = {}
-            seasons_dict[season][fmt] = fmts
+            seasons[fmt] = fmts
+            items["第_{}_季".format(season)] = seasons
 
-            # items["第_{}_季".format(season)] = seasons
             for dl in a_tags:
 
                 dl_name = dl.text.strip()
@@ -123,14 +115,8 @@ def detail(html, items=None):
                     else:
                         dl_url = dl['href']
                 except:
-                    dl_url = None
+                    dl_url = 'None'
 
-                if dl_url is not None:
-                    episodes[dl_name] = dl_url
-
-    # for k in seasons_dict:
-    #     seasons_list.append(seasons_dict[k])
-
+                episodes[dl_name] = dl_url
     print("页面分析成功")
-    items['season'] = seasons_dict
     return items

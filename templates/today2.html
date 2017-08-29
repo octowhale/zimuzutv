@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>zimuzu.tv today update list</title>
+</head>
+<body>
+today update list
+{% for data in datas %}
+
+
+<h5> {{ data['m_title'] }} </>
+
+
+
+
+    {% for dl in data['dl'] %}
+        {{ dl['dl_name'] }}, {{ dl['dl_url'] }}<br>
+    {% endfor %}
+
+{% endfor %}
+
+</body>
+</html>

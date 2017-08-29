@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>zimuzu.tv today update list</title>
+</head>
+<body>
+<h1>{{ dtdate }} 更新列表</h1>
+
+<div>
+    <table border="1">
+
+        <tr>
+            <td>更新时间</td>
+            <td>地区 / 格式</td>
+            <td>片名</td>
+            <td>下载地址</td>
+        </tr>
+        {% for data in datas %}
+
+        <tr>
+            <td>{{ data['m_date'] }} : {{ data['m_update_time'] }}</td>
+            <td>{{ data['area'] }} / {{ data['m_format'] }}</td>
+            <td><a href="http://www.zimuzu.tv/{{ data['m_detail'] }}">{{ data['m_title'] }}</a></td>
+            {% for dl in data['dl'] %}
+            <td><a href="{{ dl['dl_url'] }}">{{ dl['dl_name'] }}</a></td>
+            {% endfor %}
+
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

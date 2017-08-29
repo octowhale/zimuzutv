@@ -83,7 +83,11 @@ def detail(html, items=None):
     seasons_list = []
     seasons_dict = {}
     # li_tags = soup.find_all('li', class_='clearfix')
+
+    """节目列表"""
+    epi_list = []
     for fmt in fmts_list:
+
         # li_tags = soup.find_all('li', class_='clearfix', format_='MP4')
         li_tags = soup.find_all('li', attrs={"class": "clearfix", "format": fmt})
 
@@ -93,6 +97,8 @@ def detail(html, items=None):
         # print(len(li_tags))
         for li_tag in li_tags:
 
+            epi_dict = {}
+
             fmt = li_tag['format']
             season = li_tag['season']
             episode = li_tag['episode']
@@ -100,19 +106,17 @@ def detail(html, items=None):
             enp_title = li_tag.find('div', class_='fl').a.text
             # print(enp_title)
 
+
+            epi_dict['m_format'] = fmt
+            epi_dict['m_season'] = season
+            epi_dict['m_episode'] = episode
+            epi_dict['m_title'] = "_".join(enp_title.split('.'))
+
             a_tags = li_tag.find('div', class_='fr').find_all('a')
 
-            """集字典"""
-            episodes = {}
+            """下载方式"""
+            dl_dict = {}
 
-            # fmts["第_{}_集".format(episode)] = episodes
-            fmts["_".join(enp_title.split('.'))] = episodes
-
-            # seasons[fmt] = fmts
-            seasons_dict[season] = {}
-            seasons_dict[season][fmt] = fmts
-
-            # items["第_{}_季".format(season)] = seasons
             for dl in a_tags:
 
                 dl_name = dl.text.strip()
@@ -126,11 +130,13 @@ def detail(html, items=None):
                     dl_url = None
 
                 if dl_url is not None:
-                    episodes[dl_name] = dl_url
+                    dl_dict[dl_name] = dl_url
 
-    # for k in seasons_dict:
-    #     seasons_list.append(seasons_dict[k])
+            epi_dict['dl_ways'] = dl_dict
+            epi_list.append(epi_dict)
 
+    # items['season'] = seasons_dict
+
+    items['episodes'] = epi_list
     print("页面分析成功")
-    items['season'] = seasons_dict
     return items

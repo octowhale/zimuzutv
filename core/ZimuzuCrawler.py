@@ -24,6 +24,9 @@ class ZimuzuCrawler(object, ):
         self.time2wait = time2wait
 
     def login(self):
+        """登录"""
+
+        """todo: 是否登录判断，解决每次抓取都需要登录的尴尬"""
         r = self.s.post(self.LOGIN_URL, data=self.ZMZ_AUTH)
 
         if r.status_code != 200:
@@ -62,8 +65,9 @@ class ZimuzuCrawler(object, ):
             self.crawl_today()
 
     def crawl_detail(self, page):
-
         """抓取影片所有相关连接"""
+
+        """todo: 引入 redis，解决每次点击都爬取页面的问题"""
 
         """http://www.zimuzu.tv/resource/list/35575"""
         detail_url = "{}/resource/list/{}".format(self.SITE, page)

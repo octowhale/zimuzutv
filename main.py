@@ -31,9 +31,10 @@ def crawl_today():
 
 @app.route('/resource/<int:page>')
 def crawl_detail(page):
+    """抓取页面详细信息"""
     zmz.crawl_detail(page)
 
-    # print(page)
+    """展示页面"""
     data = zmz_show.detail_find(page)
 
     # print(data)

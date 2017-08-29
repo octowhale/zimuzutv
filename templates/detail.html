@@ -8,29 +8,31 @@
 <h1>剧集页面 </h1>
 <h1 href="http://www.zimuzu.tv/resource/{{ data['m_id'] }}">{{ data['m_name'] }} </h1>
 
+<div><table border="1">
+    <tr>
 
-{% for season in data['season'] %}
+    <td>season</td>
+    <td>episode</td>
+    <td>文件格式 </td>
+    <td>文件名称</td>
+    <td>下载地址</td>
+    </tr>
+{% for episode in data['episodes'] %}
 
-    {% for fmt in data['season'][season] %}
-    <h3>第 {{ season }} 季( {{ fmt }} )</h3>
-    <div>
-    <table border="1">
-        {% for enp in data['season'][season][fmt] %}
-            <!--{{ dl_name }} : {{ data['season'][season][fmt][dl_name] }}-->
-            <tr>
-                <td>{{ enp }}</td>
-            {% for dl_name in data['season'][season][fmt][enp] %}
-            <td><a href="{{ data['season'][season][fmt][enp][dl_name] }}">{{ dl_name }}</a></td>
-            {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-    </div>
+
+    <tr>
+    <td>{{ episode['m_season'] }}</td>
+    <td>{{ episode['m_episode'] }}</td>
+    <td>{{ episode['m_format'] }}</td>
+    <td>{{ episode['m_title'] }}</td>
+
+    {% for dl_name in episode['dl_ways'] %}
+    <td><a href="{{ episode['dl_ways'][dl_name] }}">{{ dl_name }}</a></td>
     {% endfor %}
-
+</tr>
 {% endfor %}
 
-
+</table></div>
 
 </body>
 </html>

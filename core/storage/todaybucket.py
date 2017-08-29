@@ -9,9 +9,6 @@ import pymongo
 import json
 
 
-class TodayBucket(object): pass
-
-
 mongo_auth = json.load(open('setting/mongo_auth.json', 'r', encoding='utf-8'))
 
 host, port = mongo_auth['host'], mongo_auth['port']

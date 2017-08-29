@@ -5,7 +5,7 @@
 
 import os
 import sys
-from core.storage import todaybucket
+from core.storage import todaybucket, detailbucket
 from datetime import datetime
 
 
@@ -22,10 +22,10 @@ class ZimuzuShow(object):
 
         return items
 
+    def detail_find(self, page=None):
+        if page is None:
+            return None
 
-def main():
-    pass
+        items = detailbucket.find(page)
 
-
-if __name__ == '__main__':
-    main()
+        return items

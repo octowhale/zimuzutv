@@ -7,7 +7,7 @@ import os
 import sys
 import requests
 from core.crawlers import analysis
-from core.storage import todaybucket
+from core.storage import todaybucket, detailbucket
 import json
 
 import time
@@ -31,6 +31,15 @@ class ZimuzuCrawler(object, ):
         else:
             return (self.s)
 
+    def crawl_html(self, url):
+        self.login()
+
+        r = self.s.get(url)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+
+        return r.text
+
     def crawl_today(self):
 
         today_url = "{}/today".format(self.SITE)
@@ -39,13 +48,7 @@ class ZimuzuCrawler(object, ):
         #     self.login()
 
         # print(today_url)
-        self.login()
-        r = self.s.get(today_url)
-
-        r.raise_for_status()
-        r.encoding = r.apparent_encoding
-
-        html = r.text
+        html = self.crawl_html(today_url)
 
         items = analysis.today(html)
 
@@ -58,16 +61,24 @@ class ZimuzuCrawler(object, ):
         while True:
             self.crawl_today()
 
-    def crawl_detail(self):
-        pass
+    def crawl_detail(self, page):
 
+        """抓取影片所有相关连接"""
 
-def main():
-    pass
+        """http://www.zimuzu.tv/resource/list/35575"""
+        detail_url = "{}/resource/list/{}".format(self.SITE, page)
+
+        """判断是否需要抓取页面"""
+
+        """抓取页面"""
+        html = self.crawl_html(detail_url)
+
+        items = {'m_id': page, 'm_update_time': time.time()}
+        items = analysis.detail(html, items)
+
+        detailbucket.upsert(items)
 
 
 if __name__ == '__main__':
-    main()
-
     zmz = ZimuzuCrawler()
     zmz.crawl_today()

@@ -10,6 +10,7 @@ from datetime import datetime as dt
 
 
 def today(html):
+    """分析 zimuzu.tv/today 信息"""
     # dt_date = '2017-08-29'
 
 
@@ -46,27 +47,76 @@ def today(html):
         m_dict['m_title'] = m_title
         m_dict['m_detail'] = m_detail
 
-        # print(m_area)
-        # print(m_type, m_format)
-        # print(m_title, m_detail)
-
         m_dict['dl'] = []
         for dl in movie.find('td', class_="dr_ico").find_all('a'):
             try:
-                # print("{} : {}".format(dl.text, dl['href']))
-
                 m_dict['dl'].append({'dl_name': dl.text, 'dl_url': dl['href']})
-                # print(dl)
-
-                # if dl.text == '驴':
-                #     print(m_title)
-                #     print(dl['href'])
             except:
                 pass
 
-        # print(json.dumps(m_dict))
-        # print("\n")
-
         items.append(m_dict)
 
+    return items
+
+
+def detail(html, items=None):
+    """分析页面详细信息 /resource/list/id"""
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    if items is None:
+        items = {}
+
+    movie_name = soup.find('h2').text.strip("返回详情介绍页")
+    items['m_name'] = movie_name
+    # fmts = soup.find('div', class_="download-filter").find_all('a')
+
+    # fmts_list = ['MP4', 'HDTV']
+    """格式列表"""
+    fmts_list = ['MP4', 'HDTV', '720P', 'WEB-DL']
+
+    """格式字典"""
+    fmts = {}
+
+    """季字典"""
+    seasons = {}
+    # li_tags = soup.find_all('li', class_='clearfix')
+    for fmt in fmts_list:
+        # li_tags = soup.find_all('li', class_='clearfix', format_='MP4')
+        li_tags = soup.find_all('li', attrs={"class": "clearfix", "format": fmt})
+
+        if len(li_tags) == 0:
+            continue
+
+        # print(len(li_tags))
+        for li_tag in li_tags:
+
+            fmt = li_tag['format']
+            season = li_tag['season']
+            episode = li_tag['episode']
+
+            a_tags = li_tag.find('div', class_='fr').find_all('a')
+
+            """集字典"""
+            episodes = {}
+
+            fmts["第_{}_集".format(episode)] = episodes
+
+            seasons[fmt] = fmts
+            items["第_{}_季".format(season)] = seasons
+
+            for dl in a_tags:
+
+                dl_name = dl.text.strip()
+
+                try:
+                    if dl_name == '小米路由下载':
+                        dl_url = dl['xmhref']
+                    else:
+                        dl_url = dl['href']
+                except:
+                    dl_url = 'None'
+
+                episodes[dl_name] = dl_url
+    print("页面分析成功")
     return items

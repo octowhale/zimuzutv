@@ -19,7 +19,6 @@ app = Flask(__name__)
 def today_url():
     dt_date = datetime.strftime(datetime.now(), "%m-%d")
 
-
     datas = zmz_show.today_find()
 
     return render_template('today.html', datas=datas, dtdate=dt_date)
@@ -28,6 +27,17 @@ def today_url():
 
 def crawl_today():
     zmz.crawl_today_loop()
+
+
+@app.route('/resource/<int:page>')
+def crawl_detail(page):
+    zmz.crawl_detail(page)
+
+    # print(page)
+    data = zmz_show.detail_find(page)
+
+    # print(data)
+    return render_template('detail.html', data=data)
 
 
 def main():

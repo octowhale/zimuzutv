@@ -80,8 +80,6 @@ class ZimuzuCrawler(object, ):
             return None
 
         """开始更新页面"""
-        self.redis_client.set_detail_update_info(page, now_time)
-
         """http://www.zimuzu.tv/resource/list/35575"""
         detail_url = "{}/resource/list/{}".format(self.SITE, page)
 
@@ -93,7 +91,10 @@ class ZimuzuCrawler(object, ):
         items = {'m_id': page, 'm_update_time': time.time()}
         items = analysis.detail(html, items)
 
-        detailbucket.upsert(items)
+        result = detailbucket.upsert(items)  # return True if success
+        if result:
+            """向 redis 里面插入信息"""
+            self.redis_client.set_detail_update_info(page, now_time)
 
 
 if __name__ == '__main__':

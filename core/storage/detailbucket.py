@@ -24,6 +24,8 @@ def upsert(items):
                          items,
                          upsert=True)
 
+    return True
+
 
 def find(page):
     """ 找到 page id 对应的剧集信息"""

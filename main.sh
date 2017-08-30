@@ -3,5 +3,9 @@
 
 cd $(dirname $0)
 
-python main.py &
 
+kill -15 $(ps -ef |grep "python main.py" | awk '{print $2}')
+git pull
+
+sleep 2
+python main.py &

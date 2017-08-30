@@ -8,10 +8,9 @@ import sys
 import pymongo
 import json
 
-
-mongo_auth = json.load(open('setting/mongo_auth.json', 'r', encoding='utf-8'))
-
-host, port = mongo_auth['host'], mongo_auth['port']
+with open('setting/mongo_auth.json', 'r', encoding='utf-8') as f:
+    mongo_auth = json.load(f)
+    host, port = mongo_auth['host'], mongo_auth['port']
 
 
 def upsert(items):

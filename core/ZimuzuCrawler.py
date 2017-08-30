@@ -7,8 +7,9 @@ import os
 import sys
 import requests
 from core.crawlers import analysis
-from core.storage import todaybucket, detailbucket
+from core.storage import todaybucket, detailbucket, redisbucket
 import json
+import redis
 
 import time
 import threading
@@ -22,6 +23,7 @@ class ZimuzuCrawler(object, ):
         self.ENCODING = 'utf-8'
         self.s = requests.Session()
         self.time2wait = time2wait
+        self.redis_client = redisbucket.RedisBucket()
 
     def login(self):
         """登录"""
@@ -68,6 +70,17 @@ class ZimuzuCrawler(object, ):
         """抓取影片所有相关连接"""
 
         """todo: 引入 redis，解决每次点击都爬取页面的问题"""
+
+        now_time = time.time()
+
+        # detail_update_sign = redisbucket.get_update_detail_info(page, now_time)
+        detail_update_sign = self.redis_client.get_update_detail_info(page, now_time)
+        if not detail_update_sign:
+            """如果返回为 False， 则跳过更新"""
+            return None
+
+        """开始更新页面"""
+        self.redis_client.set_detail_update_info(page, now_time)
 
         """http://www.zimuzu.tv/resource/list/35575"""
         detail_url = "{}/resource/list/{}".format(self.SITE, page)

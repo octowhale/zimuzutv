@@ -1,3 +1,4 @@
 /setting/mongo_auth.json
 /setting/zimuzu_auth.json
 *.pyc
+/setting/redis_auth.json

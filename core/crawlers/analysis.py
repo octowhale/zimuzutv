@@ -73,7 +73,16 @@ def detail(html, items=None):
 
     # fmts_list = ['MP4', 'HDTV']
     """格式列表"""
-    fmts_list = ['MP4', 'HDTV', '720P', 'WEB-DL']
+    # fmts_list = ['MP4', 'HDTV', '720P', 'WEB-DL', 'HR-HDTV']
+
+    fmts_list_atags = soup.find('div', class_='download-filter').find_all('a')
+    fmts_list = []
+    for fmt_atag in fmts_list_atags:
+        fmt_tmp = fmt_atag['format']
+        if fmt_tmp not in ('', 'APP'):
+            fmts_list.append(fmt_tmp)
+
+    # print(fmts_list)
 
     """格式字典"""
     fmts = {}

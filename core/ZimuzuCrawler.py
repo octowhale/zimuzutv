@@ -24,6 +24,7 @@ class ZimuzuCrawler(object, ):
         self.s = requests.Session()
         self.time2wait = time2wait
         self.redis_client = redisbucket.RedisBucket()
+        self.login()
 
     def login(self):
         """登录"""
@@ -34,10 +35,11 @@ class ZimuzuCrawler(object, ):
         if r.status_code != 200:
             print("登录失败")
         else:
+            print("登录成功")
             return (self.s)
 
     def crawl_html(self, url):
-        self.login()
+        # self.login()
 
         r = self.s.get(url)
         r.raise_for_status()

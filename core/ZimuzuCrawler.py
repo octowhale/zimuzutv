@@ -24,7 +24,6 @@ class ZimuzuCrawler(object, ):
         self.s = requests.Session()
         self.time2wait = time2wait
         self.redis_client = redisbucket.RedisBucket()
-        self.login()
 
     def login(self):
         """登录"""
@@ -38,8 +37,10 @@ class ZimuzuCrawler(object, ):
             print("登录成功")
             return (self.s)
 
-    def crawl_html(self, url):
-        self.login()
+    def crawl_html(self, url, is_login=True):
+
+        if is_login:
+            self.login()
 
         r = self.s.get(url)
         r.raise_for_status()
@@ -61,12 +62,12 @@ class ZimuzuCrawler(object, ):
 
         todaybucket.upsert(items)
 
-        print("等待 {} 秒继续执行下一次任务".format(self.time2wait))
-        time.sleep(int(self.time2wait))
-
     def crawl_today_loop(self):
         while True:
             self.crawl_today()
+            print("等待 {} 秒继续执行下一次任务".format(self.time2wait))
+            time.sleep(int(self.time2wait))
+
 
     def crawl_detail(self, page):
         """抓取影片所有相关连接"""

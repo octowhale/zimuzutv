@@ -8,7 +8,6 @@ import sys
 from datetime import datetime
 from flask import Flask, render_template
 from core import ZimuzuCrawler, ZimuzuShow
-import requests
 import threading
 
 app = Flask(__name__)

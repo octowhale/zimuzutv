@@ -39,7 +39,7 @@ class ZimuzuCrawler(object, ):
             return (self.s)
 
     def crawl_html(self, url):
-        # self.login()
+        self.login()
 
         r = self.s.get(url)
         r.raise_for_status()

@@ -9,7 +9,7 @@ import requests
 from core.crawlers import analysis
 from core.storage import todaybucket, detailbucket, redisbucket
 import json
-import redis
+from random import randint
 
 import time
 import threading
@@ -24,22 +24,31 @@ class ZimuzuCrawler(object, ):
         self.s = requests.Session()
         self.time2wait = time2wait
         self.redis_client = redisbucket.RedisBucket()
+        self.lock = threading.Lock()
+        self.semaphore = threading.BoundedSemaphore(5)
 
-    def login(self):
+        self.is_login = True
+
+    def login(self, is_login=True):
         """登录"""
 
         """todo: 是否登录判断，解决每次抓取都需要登录的尴尬"""
         r = self.s.post(self.LOGIN_URL, data=self.ZMZ_AUTH)
 
-        if r.status_code != 200:
-            print("登录失败")
-        else:
-            print("登录成功")
-            return (self.s)
+        rc = json.loads(r.content)
 
-    def crawl_html(self, url, is_login=True):
+        for c in rc:
+            print(c, rc[c])
+        # if r.status_code != 200:
+        #     print("登录失败")
+        # else:
+        #     print("登录成功")
+        #     return (self.s)
+        self.s.get('http://www.zimuzu.tv/user/user/')
 
-        if is_login:
+    def crawl_html(self, url):
+
+        if self.is_login:
             self.login()
 
         r = self.s.get(url)
@@ -60,7 +69,18 @@ class ZimuzuCrawler(object, ):
 
         items = analysis.today(html)
 
-        todaybucket.upsert(items)
+        threading.Thread(target=todaybucket.upsert, args=(items,)).start()
+
+        # todaybucket.upsert(items)
+
+        self.is_login = True
+        print(len(items))
+        for item in items:
+            page = item['m_detail'].split('/')[-1]
+            # print(page)
+            threading.Thread(target=self.crawl_detail, args=(page,)).start()
+            # print(item)
+        self.is_login = False
 
     def crawl_today_loop(self):
         while True:
@@ -68,11 +88,14 @@ class ZimuzuCrawler(object, ):
             print("等待 {} 秒继续执行下一次任务".format(self.time2wait))
             time.sleep(int(self.time2wait))
 
-
     def crawl_detail(self, page):
         """抓取影片所有相关连接"""
 
         """todo: 引入 redis，解决每次点击都爬取页面的问题"""
+
+        self.semaphore.acquire()
+        # print('锁')
+        time.sleep(randint(1, 3))
 
         now_time = time.time()
 
@@ -80,6 +103,8 @@ class ZimuzuCrawler(object, ):
         detail_update_sign = self.redis_client.get_update_detail_info(page, now_time)
         if not detail_update_sign:
             """如果返回为 False， 则跳过更新"""
+
+            self.semaphore.release()
             return None
 
         """开始更新页面"""
@@ -98,6 +123,10 @@ class ZimuzuCrawler(object, ):
         if result:
             """向 redis 里面插入信息"""
             self.redis_client.set_detail_update_info(page, now_time)
+
+        # time.sleep(5)
+        self.semaphore.release()
+        # print('释放锁')
 
 
 if __name__ == '__main__':

@@ -143,16 +143,17 @@ class ZimuzuCrawler(object, ):
             self.semaphore.release()
             return None
 
-        print("zimuzu.Crawler,146,", items)
+        # print("zimuzu.Crawler,146,", items)
         # result = detailbucket.upsert(items)  # return True if success
         upsert_result = detailbucket.upsert(items)  # return True if success
 
         if upsert_result:
             """插入成功，更新 redis """
+            print("{} 插入成功，更新 redis".format(page))
             self.redis_client.set_detail_update_info(page, now_time)
         else:
             """插入失败，重新排队"""
-            print("抓取 {} 失败，重新进入队列 ".format(page))
+            print("{} 抓取失败，重新进入队列".format(page))
             self.q.put((20, page))
 
         # time.sleep(5)

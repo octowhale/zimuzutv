@@ -26,8 +26,12 @@ def upsert(items):
                          items,
                          upsert=True)
 
-        if find(items['m_id']) is None:
-            return False
+        # if find(items['m_id']) is None:
+        #     return False
+
+        for item in find(items['m_id']):
+            if item is None:
+                return False
     return True
 
 
@@ -38,7 +42,7 @@ def find(page):
 
     with pymongo.MongoClient(host, port) as client:
         db = client.zimuzu
-        items = db.detail.find({'m_id': page})
+        items = db.detail.find({'m_id': '{}'.format(page)})
 
         # print(items)
         for item in items:

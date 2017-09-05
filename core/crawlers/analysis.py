@@ -67,7 +67,12 @@ def detail(html, items=None):
     if items is None:
         items = {}
 
-    movie_name = soup.find('h2').text.strip("返回详情介绍页")
+    try:
+        movie_name = soup.find('h2').text.strip("返回详情介绍页")
+    except AttributeError:
+        print("查找页面不存在")
+        return None
+
     items['m_name'] = movie_name
     # fmts = soup.find('div', class_="download-filter").find_all('a')
 

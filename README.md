@@ -43,6 +43,20 @@ python3 main.py
 
 ```
 
+## TODO LIST
+
+### 新功能
+
+- [ ] 增加 flask log
+- [ ] 增加 flask flush
+
+
+### 重构
+
+- [ ] 将数据写入 reids 与 mongodb
+- [ ] 查询时，先查询 reids，再查询 mongodb， 在查询 字幕组.tv
+
+
 ## License
 
 GUN General Public License v3.0

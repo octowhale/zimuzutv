@@ -15,7 +15,9 @@ with open('setting/mongo_auth.json', 'r', encoding='utf-8') as f:
 
 
 def upsert(items):
-    """将影片信息记录在 mongodb 中，如存在，则更新"""
+    """将影片信息记录在 mongodb 中，如存在，则更新
+    如果返回为 True 表示插入成功
+    """
     # with pymongo.MongoClient('ss.tangx.in', 9200) as client:
     with pymongo.MongoClient(host, port) as client:
         db = client.zimuzu
@@ -24,6 +26,8 @@ def upsert(items):
                          items,
                          upsert=True)
 
+        if find(items['m_id']) is None:
+            return False
     return True
 
 
@@ -50,6 +54,7 @@ def find_update_time(page):
         db = client.zimuzu
 
         db.detail.find({'m_id': page}, {'m_update_time': 1, "_id": 0})
+        # db.detail.find({'m_id': page}, {'m_update_time': 1, "_id": 0})
 
 
 if __name__ == "__main__":

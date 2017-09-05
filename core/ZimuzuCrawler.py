@@ -10,6 +10,7 @@ from core.crawlers import analysis
 from core.storage import todaybucket, detailbucket, redisbucket
 import json
 from random import randint
+import queue
 
 import time
 import threading
@@ -25,9 +26,9 @@ class ZimuzuCrawler(object, ):
         self.time2wait = time2wait
         self.redis_client = redisbucket.RedisBucket()
         self.lock = threading.Lock()
-        self.semaphore = threading.BoundedSemaphore(5)
-
-        self.is_login = True
+        self.semaphore = threading.BoundedSemaphore(1)
+        self.q = queue.PriorityQueue()
+        self.is_login = False
 
     def login(self, is_login=True):
         """登录"""
@@ -39,16 +40,16 @@ class ZimuzuCrawler(object, ):
 
         for c in rc:
             print(c, rc[c])
-        # if r.status_code != 200:
-        #     print("登录失败")
-        # else:
-        #     print("登录成功")
-        #     return (self.s)
-        self.s.get('http://www.zimuzu.tv/user/user/')
+            # if r.status_code != 200:
+            #     print("登录失败")
+            # else:
+            #     print("登录成功")
+            #     return (self.s)
+            # self.s.get('http://www.zimuzu.tv/user/user/')
 
     def crawl_html(self, url):
 
-        if self.is_login:
+        if not self.is_login:
             self.login()
 
         r = self.s.get(url)
@@ -73,14 +74,27 @@ class ZimuzuCrawler(object, ):
 
         # todaybucket.upsert(items)
 
-        self.is_login = True
+        # self.is_login = True
         print(len(items))
         for item in items:
             page = item['m_detail'].split('/')[-1]
             # print(page)
-            threading.Thread(target=self.crawl_detail, args=(page,)).start()
+            # threading.Thread(target=self.crawl_detail, args=(page,)).start()
             # print(item)
-        self.is_login = False
+
+            self.q.put((10, page))
+
+            # self.is_login = False
+
+    def crawl_today_detail(self):
+
+        while True:
+            self.is_login = True
+            pri, page = self.q.get()
+            self.crawl_detail(page)
+            # print(page)
+            # time.sleep(1)
+            self.is_login = False
 
     def crawl_today_loop(self):
         while True:
@@ -89,40 +103,57 @@ class ZimuzuCrawler(object, ):
             time.sleep(int(self.time2wait))
 
     def crawl_detail(self, page):
-        """抓取影片所有相关连接"""
+        """抓取影片所有相关连接
 
+            page: 资源id
+            pri: 队列权重
+        """
         """todo: 引入 redis，解决每次点击都爬取页面的问题"""
 
         self.semaphore.acquire()
         # print('锁')
-        time.sleep(randint(1, 3))
 
         now_time = time.time()
 
         # detail_update_sign = redisbucket.get_update_detail_info(page, now_time)
-        detail_update_sign = self.redis_client.get_update_detail_info(page, now_time)
-        if not detail_update_sign:
+        is_crawl = self.redis_client.get_update_detail_info(page, now_time)
+        if not is_crawl:
             """如果返回为 False， 则跳过更新"""
-
             self.semaphore.release()
             return None
 
+        # 等待时间
+        time.sleep(2)
         """开始更新页面"""
         """http://www.zimuzu.tv/resource/list/35575"""
+
+        # time.sleep(randint(5, 10))
         detail_url = "{}/resource/list/{}".format(self.SITE, page)
 
         """判断是否需要抓取页面"""
 
         """抓取页面"""
+        # print(page),
         html = self.crawl_html(detail_url)
 
         items = {'m_id': page, 'm_update_time': time.time()}
         items = analysis.detail(html, items)
 
-        result = detailbucket.upsert(items)  # return True if success
-        if result:
-            """向 redis 里面插入信息"""
+        if items is None:
+            self.semaphore.release()
+            return None
+
+        print("zimuzu.Crawler,146,", items)
+        # result = detailbucket.upsert(items)  # return True if success
+        upsert_result = detailbucket.upsert(items)  # return True if success
+
+        if upsert_result:
+            """插入成功，更新 redis """
             self.redis_client.set_detail_update_info(page, now_time)
+        else:
+            """插入失败，重新排队"""
+            print("抓取 {} 失败，重新进入队列 ".format(page))
+            self.q.put((20, page))
 
         # time.sleep(5)
         self.semaphore.release()

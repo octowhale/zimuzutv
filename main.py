@@ -38,12 +38,19 @@ def crawl_detail(page):
     data = zmz_show.detail_find(page)
 
     # print(data)
+
+    if data is None:
+        return render_template('404.html')
+    # print(data)
     return render_template('detail.html', data=data)
 
 
 def main():
     spider = threading.Thread(target=crawl_today)
     spider.start()
+
+    spider2 = threading.Thread(target=zmz.crawl_today_detail)
+    spider2.start()
 
     app.run('127.0.0.1', 23333)
     pass

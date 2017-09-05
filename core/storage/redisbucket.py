@@ -20,6 +20,8 @@ class RedisBucket(object):
             self.redis_client = redis.Redis(connection_pool=redis_pool)
 
     def get_update_detail_info(self, page, now_time):
+
+        """如果返回 True， 则需要抓取"""
         key = "r{}".format(page)
         update_time = self.redis_client.get(key)
 

@@ -18,6 +18,7 @@ def upsert(items):
     """将影片信息记录在 mongodb 中，如存在，则更新
     如果返回为 True 表示插入成功
     """
+    # print(__name__, items)
     # with pymongo.MongoClient('ss.tangx.in', 9200) as client:
     with pymongo.MongoClient(host, port) as client:
         db = client.zimuzu
@@ -26,12 +27,14 @@ def upsert(items):
                          items,
                          upsert=True)
 
-        # if find(items['m_id']) is None:
-        #     return False
+        find_result = exist_check(items['m_id'])
+        # print('find_result: ', find_result)
+        if find_result is None:
+            return False
 
-        for item in find(items['m_id']):
-            if item is None:
-                return False
+            # for item in find(items['m_id']):
+            #     if item is None:
+            #         return False
     return True
 
 
@@ -43,6 +46,21 @@ def find(page):
     with pymongo.MongoClient(host, port) as client:
         db = client.zimuzu
         items = db.detail.find({'m_id': '{}'.format(page)})
+
+        # print(items)
+        for item in items:
+            # print(item)
+            return item
+
+
+def exist_check(page):
+    """ 找到 page id 对应的剧集信息"""
+    if page is None:
+        return None
+
+    with pymongo.MongoClient(host, port) as client:
+        db = client.zimuzu
+        items = db.detail.find({'m_id': '{}'.format(page)}, {"_id": 0, 'm_id': 1})
 
         # print(items)
         for item in items:

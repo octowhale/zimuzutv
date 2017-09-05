@@ -56,7 +56,12 @@ class ZimuzuCrawler(object, ):
         r.raise_for_status()
         r.encoding = r.apparent_encoding
 
+        # self.dumps_to_file('xxx.html', r.text)
         return r.text
+
+    def dumps_to_file(self, fname, content):
+        with open(fname, 'w', encoding='utf-8') as f:
+            f.write(content)
 
     def crawl_today(self):
 

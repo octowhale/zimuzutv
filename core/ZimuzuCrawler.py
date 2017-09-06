@@ -71,6 +71,7 @@ class ZimuzuCrawler(object, ):
         #     self.login()
 
         # print(today_url)
+        self.is_login = False
         html = self.crawl_html(today_url)
 
         items = analysis.today(html)
@@ -99,6 +100,8 @@ class ZimuzuCrawler(object, ):
             self.crawl_detail(page)
             # print(page)
             # time.sleep(1)
+
+            # 因为 crawl_detail 在队列中等待，因此下面这一行不会被执行，从而导致 crawl_today 的时候登录过期
             self.is_login = False
 
     def crawl_today_loop(self):

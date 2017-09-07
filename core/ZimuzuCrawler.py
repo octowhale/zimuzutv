@@ -47,9 +47,12 @@ class ZimuzuCrawler(object, ):
             #     return (self.s)
             # self.s.get('http://www.zimuzu.tv/user/user/')
 
-    def crawl_html(self, url):
+    def crawl_html(self, url, do_login=False):
 
         if not self.is_login:
+            self.login()
+
+        if do_login:
             self.login()
 
         r = self.s.get(url)
@@ -72,7 +75,7 @@ class ZimuzuCrawler(object, ):
 
         # print(today_url)
         self.is_login = False
-        html = self.crawl_html(today_url)
+        html = self.crawl_html(today_url, True)
 
         items = analysis.today(html)
 

@@ -52,7 +52,7 @@ class ZimuzuCrawler(object, ):
         if not self.is_login:
             self.login()
 
-        if do_login:
+        elif do_login:
             self.login()
 
         r = self.s.get(url)

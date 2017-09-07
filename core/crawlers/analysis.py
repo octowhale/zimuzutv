@@ -80,7 +80,18 @@ def detail(html, items=None):
     """格式列表"""
     # fmts_list = ['MP4', 'HDTV', '720P', 'WEB-DL', 'HR-HDTV']
 
-    fmts_list_atags = soup.find('div', class_='download-filter').find_all('a')
+    try:
+        fmts_list_atags = soup.find('div', class_='download-filter').find_all('a')
+    except AttributeError:
+        # 保存错误页面以便分析
+        if not os.path.exists('failed_pages'):
+            os.makedirs('failed_pages')
+        failed_filename = os.path.join('failed_pages', movie_name)
+        with open(failed_filename, 'w', encoding='utf-8') as f:
+            f.write(html)
+
+        return None
+
     fmts_list = []
     for fmt_atag in fmts_list_atags:
         fmt_tmp = fmt_atag['format']

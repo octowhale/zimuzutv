@@ -49,10 +49,16 @@ class ZimuzuCrawler(object, ):
 
     def crawl_html(self, url, do_login=False):
 
-        if not self.is_login:
-            self.login()
+        """抓取页面内容，返回 html"""
 
-        elif do_login:
+        """if-else 写法"""
+        # if not self.is_login:
+        #     self.login()
+        # elif do_login:
+        #     self.login()
+
+        """断言 写法"""
+        if not self.is_login or do_login:
             self.login()
 
         r = self.s.get(url)

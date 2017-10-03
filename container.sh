@@ -18,7 +18,7 @@ function _stop()
 
 function _start()
 {
-    docker run -d --rm -p 23333:23333 --network zimuzu zimuzutv:${IMAGE_VERSION}
+    docker run -d --rm -p 23333:23333 --name zimuzutv --network zimuzu zimuzutv:${IMAGE_VERSION}
 }
 
 function _restart()

@@ -9,4 +9,4 @@ git pull
 kill -15 $(ps -ef |grep "python main.py" |grep -v "$0|grep" | awk '{print $2}')
 
 sleep 2
-python main.py &
+python main.py 

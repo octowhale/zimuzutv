@@ -18,7 +18,7 @@ app = Flask(__name__)
 def today_url():
     dt_date = datetime.strftime(datetime.now(), "%m-%d")
 
-    datas = zmz_show.today_find()
+    datas = zmz_show.today_find(dt_date)
 
     return render_template('today.html', datas=datas, dtdate=dt_date)
     # return render_template('today.html')

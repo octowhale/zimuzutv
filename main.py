@@ -52,7 +52,7 @@ def main():
     spider2 = threading.Thread(target=zmz.crawl_today_detail)
     spider2.start()
 
-    app.run('127.0.0.1', 23333)
+    app.run('0.0.0.0', 23333)
     pass
 
 
